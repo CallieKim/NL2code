@@ -166,9 +166,9 @@ def convert_dataset():
             can_fully_reconstructed_examples_num += 1
 
         # train, valid, test splits
-        if 0 <= idx < 533:
+        if 0 <= idx < 1900:
             train_data.add(example)
-        elif idx < 599:
+        elif idx < 2380:
             dev_data.add(example)
         else:
             test_data.add(example)
