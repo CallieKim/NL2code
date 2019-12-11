@@ -15,6 +15,7 @@ from dataset import gen_vocab, DataSet, DataEntry, Action, APPLY_RULE, GEN_TOKEN
 import ast
 import astor
 from nn.utils.io_utils import serialize_to_file, deserialize_from_file
+from lang.conala.util import *
 
 def convert_dataset():
     MAX_QUERY_LENGTH = 70
@@ -166,11 +167,11 @@ def convert_dataset():
             can_fully_reconstructed_examples_num += 1
 
         # train, valid, test splits
-        if 0 <= idx < 1900:
+        if 0 <= idx < 100:
             train_data.add(example)
-        elif idx < 2380:
+        elif idx < 150:
             dev_data.add(example)
-        else:
+        if 0 <= idx < 100:
             test_data.add(example)
 
         all_examples.append(example)
@@ -204,8 +205,16 @@ def preprocess_conala_dataset(data_path):
     with open(data_path, 'r') as data:
         data_json = json.load(data)
         for idx, data_example in enumerate(data_json):
+            print(idx)
+            example = preprocess_example(data_example)
+            python_ast = ast.parse(example['canonical_snippet'])
+            canonical_code = astor.to_source(python_ast).strip()
+            
             try:
-                clean_query_tokens, clean_code, parse_tree = canonicalize_conala_example(data_example)
+                clean_query_tokens = example['intent_tokens']
+                clean_code = canonical_code
+                parse_tree = python_ast
+                #clean_query_tokens, clean_code, parse_tree = canonicalize_conala_example(data_example)
             except Exception:
                 print("Unable to parse example")
                 print(data_example)
@@ -234,6 +243,30 @@ def canonicalize_conala_example(data_example):
     assert gold_source == pred_source, 'sanity check fails: gold=[%s], actual=[%s]' % (gold_source, pred_source)
 
     return query_tokens, data_example["snippet"], parse_tree
+
+def preprocess_example(example_json):
+    intent = example_json['intent']
+    rewritten_intent = example_json['rewritten_intent']
+    snippet = example_json['snippet']
+    question_id = example_json['question_id']
+
+    if rewritten_intent is None:
+        rewritten_intent = intent
+    #print(rewritten_intent)
+    #print(snippet)
+    canonical_intent, slot_map = canonicalize_intent(rewritten_intent)
+    canonical_snippet = canonicalize_code(snippet, slot_map)
+    intent_tokens = tokenize_intent(canonical_intent)
+    #decanonical_snippet = decanonicalize_code(canonical_snippet, slot_map)
+
+    reconstructed_snippet = astor.to_source(ast.parse(snippet)).strip()
+    #reconstructed_decanonical_snippet = astor.to_source(ast.parse(decanonical_snippet)).strip()
+
+    #assert compare_ast(ast.parse(reconstructed_snippet), ast.parse(reconstructed_decanonical_snippet))
+    return {'canonical_intent': canonical_intent,
+            'intent_tokens': intent_tokens,
+            'slot_map': slot_map,
+            'canonical_snippet': canonical_snippet}
 
 def main():
     convert_dataset()
