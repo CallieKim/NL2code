@@ -11,7 +11,7 @@ elif [ "$1" == "conala" ]; then
 	# conala dataset
 	echo "training conala dataset"
 	dataset="conala.freq3.max_action350.pre_suf.unary_closure.bin"
-	commandline="-batch_size 10 -max_epoch 10 -valid_per_batch 300 -save_per_batch 300 -decode_max_time_step 400 -optimizer adadelta -rule_embed_dim 128 -node_embed_dim 64 -valid_metric bleu"
+	commandline="-batch_size 10 -max_epoch 30 -valid_per_batch 300 -save_per_batch 300 -decode_max_time_step 400 -optimizer adadelta -rule_embed_dim 128 -node_embed_dim 64 -valid_metric bleu"
 	datatype="conala"
 else
 	# django dataset

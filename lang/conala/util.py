@@ -3,6 +3,9 @@
 
 from __future__ import print_function
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 import itertools
 import re
 import ast
@@ -45,7 +48,7 @@ def isIdentifier(t):
 
 def infer_slot_type(quote, value):
     #print(type(value))
-    value=str(value)
+    #value=str(value)
     if quote == '`' and isIdentifier(value):
     #if quote == '`' and value.isidentifier():
         return 'var'
@@ -90,7 +93,7 @@ def canonicalize_intent(intent):
         slot_map[slot_name] = {'value': value.strip().encode().decode('unicode_escape', 'ignore'),
                                'quote': quote,
                                'type': slot_type}
-
+    print(intent)
     return intent, slot_map
 
 

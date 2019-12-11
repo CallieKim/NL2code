@@ -29,9 +29,9 @@ def convert_dataset():
     parse_trees = [e['parse_tree'] for e in data]
 
     # apply unary closures
-    unary_closures = get_top_unary_closures(parse_trees, k=20)
-    for parse_tree in parse_trees:
-        apply_unary_closures(parse_tree, unary_closures)
+    #unary_closures = get_top_unary_closures(parse_trees, k=20)
+    #for parse_tree in parse_trees:
+    #    apply_unary_closures(parse_tree, unary_closures)
 
     # build the grammar
     grammar = get_grammar(parse_trees)
@@ -167,11 +167,11 @@ def convert_dataset():
             can_fully_reconstructed_examples_num += 1
 
         # train, valid, test splits
-        if 0 <= idx < 100:
+        if 0 <= idx < 1:
             train_data.add(example)
-        elif idx < 150:
+        elif idx < 2:
             dev_data.add(example)
-        if 0 <= idx < 100:
+        if 0 <= idx < 1:
             test_data.add(example)
 
         all_examples.append(example)
@@ -205,14 +205,21 @@ def preprocess_conala_dataset(data_path):
     with open(data_path, 'r') as data:
         data_json = json.load(data)
         for idx, data_example in enumerate(data_json):
-            print(idx)
-            example = preprocess_example(data_example)
-            python_ast = ast.parse(example['canonical_snippet'])
-            canonical_code = astor.to_source(python_ast).strip()
+            #example = preprocess_example(data_example)
+            #print(example['canonical_snippet'])
+            #python_ast = ast.parse(example['canonical_snippet'])
+            #canonical_code = astor.to_source(python_ast).strip()
             
             try:
+                example = preprocess_example(data_example)
+                #python_ast = ast.parse(example['canonical_snippet'])
+
+                python_ast = parse_raw(example['canonical_snippet'])
+
+                #canonical_code = astor.to_source(python_ast).strip()
+
                 clean_query_tokens = example['intent_tokens']
-                clean_code = canonical_code
+                clean_code = example['canonical_snippet']
                 parse_tree = python_ast
                 #clean_query_tokens, clean_code, parse_tree = canonicalize_conala_example(data_example)
             except Exception:

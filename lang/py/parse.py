@@ -271,7 +271,6 @@ def parse_raw(code):
     py_ast = ast.parse(code)
 
     tree = python_ast_to_parse_tree(py_ast.body[0])
-
     tree = add_root(tree)
 
     return tree

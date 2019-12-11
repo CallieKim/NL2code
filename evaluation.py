@@ -63,7 +63,7 @@ def evaluate_decode_results(dataset, decode_results, verbose=True):
     from lang.py.parse import tokenize_code, de_canonicalize_code
     # tokenize_code = tokenize_for_bleu_eval
     import ast
-    assert dataset.count == len(decode_results)
+    #assert dataset.count == len(decode_results)
 
     f = f_decode = None
     if verbose:
